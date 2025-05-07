@@ -1,0 +1,54 @@
+class Node {
+public:
+    int val, start, end;
+    Node* left, *right;
+    Node (int val, int start, int end) {
+        this -> val = val;
+        this -> start = start;
+        this -> end = end;
+        this -> left = NULL;
+        this -> right = NULL;
+    }
+    Node (int start, int end) {
+        this -> start = start;
+        this -> end = end;
+        this -> left = NULL;
+        this -> right = NULL;
+    }
+};
+
+class Solution {
+    void Build (int low, int high, Node* root, vector<int> &arr) {
+        if (low == high) {
+            root -> start = root -> end = low;
+            root -> val = arr[low];
+            return;
+        }
+        int mid = low + (high - low) / 2;
+        Node* L = new Node (low, mid);
+        Node* R = new Node (mid + 1, high);
+        root -> left = L, root -> right = R;
+        Build (low, mid, L, arr);
+        Build (mid + 1, high, R, arr);
+        root -> start = low, root -> end = high;
+        root -> val = min (root -> left -> val, root -> right -> val);
+    }
+    void LevelOrderTraversal (Node* root) {
+        queue<Node*> q;
+        q.push (root);
+        while (!q.empty ()) {
+            int size = q.size ();
+            for (auto i = 0; i < size; i++) {
+                auto j = q.front ();
+                q.pop ();
+                cout << "[" << j -> val << "]" << " ";
+                if (j -> left) 
+                    q.push (j -> left);
+                if (j -> right) 
+                    q.push (j -> right);
+            }
+            cout << endl;
+        }
+        return;
+    }
+};
