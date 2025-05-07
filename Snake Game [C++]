@@ -1,0 +1,151 @@
+#include "bits/stdc++.h"
+#include <conio.h>
+#include "time.h"
+using namespace std;
+
+
+const int8_t Height = 20, Width = 40;
+vector<pair<int8_t, int8_t>> Body;
+set<pair<int8_t, int8_t>> Set;
+int8_t X, Y, FruitX, FruitY;
+int Score;
+bool GameOver;
+vector<string> Print (Height, string (Width, ' '));
+string Row(Width + 2, '#');
+
+enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
+eDirection Dir;
+
+void Update () {
+	if (Body.empty ()) {
+		Set.insert ({X, Y});
+		Body.push_back ({X, Y});
+		return;
+	}
+	if(Body.size () == 1) {
+		Set.erase ({Body.back ()});
+		Body.pop_back ();
+		Body.push_back ({X, Y});
+		Set.insert ({X, Y});
+	}
+	Set.insert ({X, Y});
+	Body.insert (Body.begin (), {X, Y});
+	Set.erase ({Body.back ()});
+	Body.pop_back ();
+}
+
+bool OverLap () {
+	if (Dir == STOP) {
+		return false;
+	}
+	if (Set.find ({X, Y}) != Set.end ()) {
+		return true;
+	}
+	return false;
+}
+
+void Refresh () {
+	// Change values.
+	for (auto &Row: Body) {
+		Print[Row.first][Row.second] = 'O';
+	}
+	Print[FruitX][FruitY] = 'F';
+	for (auto &String: Print) {
+		cout << "#";
+		for (auto &Row: String) {
+			cout << Row;
+		}
+		cout << "#";
+		cout << endl;
+	}
+	// Revert Back.
+	for (auto &Row: Body) {
+		Print[Row.first][Row.second] = ' ';
+	}
+	Print[FruitX][FruitY] = 'F';
+
+}
+
+// void Setup () {
+// 	GameOver = false;
+// 	Dir = STOP;
+// 	X = (Width >> 1);
+// 	Y = (Height >> 1);
+// 	FruitX = rand () % Width;
+// 	FruitY = rand () % Height;
+// 	Score = 0;
+// }
+
+void Draw () {
+	system ("cls");
+
+	cout << Row << endl;
+	Refresh ();
+	cout << Row << endl;
+
+	cout << "Score: " << Score;
+}
+
+void Input () {
+	if (_kbhit ()) {
+		switch (_getch ()) {
+			case 'a':
+				Dir = LEFT;
+				break;
+			case 'w':
+				Dir = UP;
+				break;
+			case 's':
+				Dir = DOWN;
+				break;
+			case 'd':
+				Dir = RIGHT;
+				break;
+			case 'x':
+				GameOver = true;
+				break;
+		}
+	}
+}
+
+void Logic () {
+	// Body.erase ({X, Y});
+	switch (Dir) {
+	case LEFT:
+		Y--;
+		break;
+	case RIGHT:
+		Y++;
+		break;
+	case UP:
+		X--;
+		break;
+	case DOWN:
+		X++;
+		break;
+	default:
+		break;
+	}
+	if(X > Height || X < 0 || Y > Width || Y < 0 || OverLap()) { // Overlap ();
+		GameOver = true;
+	}
+	// Body.insert ({X, Y});
+	if (X == FruitX && Y == FruitY) {
+		Body.push_back ({X, Y});
+		Score += 10;
+		FruitX = rand () % Height;
+		FruitY = rand () % Width;
+	}
+	else Update ();
+}
+
+int main () {
+	srand(time(0));
+	while (!GameOver) {
+		Draw ();
+		Input ();
+		Logic ();
+		_sleep (100);
+	}
+	cout << "\nGave over.";
+}
