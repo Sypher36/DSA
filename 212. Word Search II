@@ -1,0 +1,84 @@
+// Trie based concept.
+struct Node {
+    Node* links[26];
+    string word = "";
+    bool ContainsKey(char ch) {
+        return (links[ch - 'a'] != NULL);
+    }
+    void Put(char ch, Node* node) {
+        links[ch - 'a'] = node;
+    }
+    Node* Get(char ch) {
+        return links[ch - 'a'];
+    }
+    void SetWord(string word) {
+        this -> word = word;
+    }
+    string GetWord() {
+        return word;
+    }
+    bool Word() {
+        return word.size();
+    }
+    void RemoveWord() { word = "" ;}
+};
+
+class Trie {
+private:
+    Node* root;
+public:
+    Trie(vector<string> &words) {
+        root = new Node();
+        for(auto &word : words) {
+            Insert(word);
+        }
+    }
+    Node* GetRoot() { return root; }
+    void Insert(string word) {
+        int N = word.size();
+        Node* node = root;
+        for(auto i = 0; i < N; i++) {
+            if(!node -> ContainsKey(word[i])) {
+                node -> Put(word[i], new Node());
+            }
+            node = node -> Get(word[i]);
+        }
+        node -> SetWord(word);
+    }
+};
+
+class Solution {
+private:
+    vector<string> A;
+    int M, N;
+    bool isValid(int &X, int &Y) {
+        return X >= 0 && X < M && Y >= 0 && Y < N;
+    }
+    int x[5] = {0, 1, 0, -1, 0};
+    void DFS(int x, int y, Node* root, vector<vector<char>> &board) {
+        if(board[x][y] == '.' || !root -> ContainsKey(board[x][y])) return;
+        Node* node = root -> Get(board[x][y]);
+        if(node -> Word()) {
+            A.push_back(node -> GetWord());
+            node -> RemoveWord();
+        }
+        char OG = board[x][y];
+        board[x][y] = '.';
+        for(auto i = 0; i < 4; i++) {
+            int X = x + (this -> x[i]), Y = y + (this -> x[i + 1]);
+            if(isValid(X, Y)) DFS(X, Y, node, board);
+        }
+        board[x][y] = OG;
+    }
+public:
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        Trie* trie = new Trie(words);
+        Node* root = trie -> GetRoot();
+        M = board.size(), N = board[0].size();
+        for(auto i = 0; i < M; i++) 
+            for(auto j = 0; j < N; j++) 
+                if(root -> ContainsKey(board[i][j])) 
+                    DFS(i, j, root, board);
+        return A;
+    }
+};
