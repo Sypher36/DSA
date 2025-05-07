@@ -1,0 +1,24 @@
+struct Node {
+    Node* links[26];
+    bool IsEnd = false;
+    
+    bool ContainsKey(char ch) {
+        return (links[ch - 'a'] != NULL);
+    }
+    
+    void Put(char ch, Node* node) {
+        links[ch - 'a'] = node;
+    }
+    
+    Node* Get(char ch) {
+        return links[ch - 'a'];
+    }
+    
+    void SetEnd() {
+        IsEnd = true;
+    }
+    
+    bool GetEnd() {
+        return IsEnd;
+    }
+};
